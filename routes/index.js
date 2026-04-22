@@ -4,12 +4,12 @@ var router = express.Router();
 /* GET home page. */
 router.get('/', function(req, res, next){
   try {
-    req.db.query('SELECT * FROM todos;', (err, results) => {
+    req.db.query('SELECT * FROM products;', (err, results) => {
       if (err) {
         console.error('Error fetching todos:', err);
         return res.status(500).send('Error fetching todos');
       }
-      res.render('index', { title: 'My Simple TODO', todos: results });
+      res.render('index', { title: 'My Simple TODO', featuredProducts: results });
     });
   } catch (error) {
     console.error('Error fetching items:', error);
