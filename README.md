@@ -50,3 +50,7 @@ npm start
 
 On Codespaces, you can access the application by forwarding port 3000. Open the
 forwarded port in your browser to view the application.
+
+## Resources used
+
+https://fonts.google.com/selection/embed

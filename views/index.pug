@@ -1,15 +1,14 @@
 extends layout
 
+block styles 
+  link(rel='stylesheet', href='/stylesheets/homePageStyle.css')
+
 block content
-  nav.nav-bar
-    button Home 
-    button Menu 
-    img(src='./images/black_logo.png')
-    button About Us 
-    button Reviews
   div.page-content
-    ul
+    h1.page-title Featured Items
+    ul.product-list
       each product in featuredProducts
         li.product-display
+          img.product-image(src= product_image)
           p= product.product_name + " - $" + product.price
 

@@ -1,0 +1,14 @@
+.product-list {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.product-display {
+    list-style-type: none;
+    margin: 2rem;
+}
+
+.product-image {
+    height: 250px;
+    width: 250px;
+}

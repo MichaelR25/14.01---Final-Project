@@ -2,6 +2,24 @@ doctype html
 html
   head
     title= title
-    link(rel='stylesheet', href='/stylesheets/style.css')
-  body
+    link(rel='stylesheet', href='/stylesheets/bodyStyle.css')
+    link(rel='stylesheet', href='/stylesheets/navBarStyle.css')
+    link(rel="preconnect", href="https://fonts.googleapis.com")
+    link(rel="preconnect", href="https://fonts.gstatic.com" crossorigin)
+    link(href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap", rel="stylesheet")
+    block styles
+
+  body.montserrat-body
+    nav.nav-bar
+      ul.nav-links
+        li
+          img#logo(src='./images/black_logo.png')
+        li
+          a#home-link(href="/") Home 
+        li
+          a#menu-link(href="/menu") Menu 
+        li 
+          a#about-link(href="/about") About Us 
+        li
+          a#reviews-link(href="/reviews") Reviews
     block content
