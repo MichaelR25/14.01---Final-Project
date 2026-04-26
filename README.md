@@ -22,6 +22,14 @@ only need to run this script once per Codespace.
 ./setup_scripts/install_db.sh
 ```
 
+## Make sure the Database is installed and Running
+
+If you encounter issues with the database, you can check the status of the
+MariaDB service using the command below. If the service is not running, you can
+start it with `sudo service mariadb start`. If the mariadb service is not
+installed, you can run the `install_db.sh` script again to reinstall it.
+
+
 ## Create the Database Tables
 
 Create the initial tables by running the following command:

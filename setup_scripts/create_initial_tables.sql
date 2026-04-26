@@ -7,7 +7,8 @@ CREATE TABLE IF NOT EXISTS products (
     product_name VARCHAR(100) NOT NULL UNIQUE,
     price DECIMAL(5,2) NOT NULL,
     product_type VARCHAR(32),
-    product_description TEXT
+    product_description TEXT,
+    average_rating DECIMAL(3,2)
 );
 
 CREATE TABLE IF NOT EXISTS users (
