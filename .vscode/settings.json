@@ -14,6 +14,20 @@
             "username": "root",
             "password": "12345",
             "connectionTimeout": 10
+        },
+        {
+            "mysqlOptions": {
+                "authProtocol": "default",
+                "enableSsl": "Disabled"
+            },
+            "ssh": "Disabled",
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 3000,
+            "driver": "MariaDB",
+            "name": "donuts",
+            "database": "downtown_donuts_data",
+            "username": "root"
         }
     ]
 }

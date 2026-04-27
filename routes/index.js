@@ -4,12 +4,12 @@ var router = express.Router();
 /* GET home page. */
 router.get('/', function(req, res, next){
   try {
-    req.db.query('SELECT * FROM todos;', (err, results) => {
+    req.db.query('SELECT * FROM products ORDER BY average_rating DESC LIMIT 5;', (err, results) => {
       if (err) {
         console.error('Error fetching todos:', err);
         return res.status(500).send('Error fetching todos');
       }
-      res.render('index', { title: 'My Simple TODO', todos: results });
+      res.render('index', { title: 'Downtown Donuts', featuredProducts: results});
     });
   } catch (error) {
     console.error('Error fetching items:', error);
@@ -17,40 +17,66 @@ router.get('/', function(req, res, next){
   }
 });
 
-router.post('/create', function (req, res, next) {
-    const { task } = req.body;
-    try {
-      req.db.query('INSERT INTO todos (task) VALUES (?);', [task], (err, results) => {
-        if (err) {
-          console.error('Error adding todo:', err);
-          return res.status(500).send('Error adding todo');
-        }
-        console.log('Todo added successfully:', results);
-        // Redirect to the home page after adding
-        res.redirect('/');
-      });
-    } catch (error) {
-      console.error('Error adding todo:', error);
-      res.status(500).send('Error adding todo');
-    }
+router.get('/products/:id', function(req, res, next){
+  try {
+    req.db.query('SELECT * FROM products;', (err, results) => {
+      if (err) {
+        console.error('Error fetching todos:', err);
+        return res.status(500).send('Error fetching todos');
+      }
+      res.render('product', { title: 'Downtown Donuts'});
+    });
+  } catch (error) {
+    console.error('Error fetching items:', error);
+    res.status(500).send('Error fetching items');
+  }
 });
 
-router.post('/delete', function (req, res, next) {
-    const { id } = req.body;
-    try {
-      req.db.query('DELETE FROM todos WHERE id = ?;', [id], (err, results) => {
-        if (err) {
-          console.error('Error deleting todo:', err);
-          return res.status(500).send('Error deleting todo');
-        }
-        console.log('Todo deleted successfully:', results);
-        // Redirect to the home page after deletion
-        res.redirect('/');
+router.get('/menu', function(req, res, next){
+  try {
+    req.db.query('SELECT * FROM products;', (err, results) => {
+      if (err) {
+        console.error('Error fetching todos:', err);
+        return res.status(500).send('Error fetching todos');
+      }
+      res.render('menu', { title: 'Downtown Donuts'});
     });
-    }catch (error) {
-        console.error('Error deleting todo:', error);
-        res.status(500).send('Error deleting todo:');
-    }
+  } catch (error) {
+    console.error('Error fetching items:', error);
+    res.status(500).send('Error fetching items');
+  }
 });
+
+router.get('/about', function(req, res, next){
+  try {
+    req.db.query('SELECT * FROM products;', (err, results) => {
+      if (err) {
+        console.error('Error fetching todos:', err);
+        return res.status(500).send('Error fetching todos');
+      }
+      res.render('about', { title: 'Downtown Donuts'});
+    });
+  } catch (error) {
+    console.error('Error fetching items:', error);
+    res.status(500).send('Error fetching items');
+  }
+});
+
+router.get('/reviews', function(req, res, next){
+  try {
+    req.db.query('SELECT * FROM products;', (err, results) => {
+      if (err) {
+        console.error('Error fetching todos:', err);
+        return res.status(500).send('Error fetching todos');
+      }
+      res.render('store_reviews', { title: 'Downtown Donuts'});
+    });
+  } catch (error) {
+    console.error('Error fetching items:', error);
+    res.status(500).send('Error fetching items');
+  }
+});
+
+
 
 module.exports = router;

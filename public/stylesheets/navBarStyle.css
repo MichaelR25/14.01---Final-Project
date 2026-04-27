@@ -1,0 +1,34 @@
+.nav-bar {
+  padding: 0.5rem 1rem;
+  background-color: white;
+}
+
+.nav-links {
+  display: flex;
+  list-style-type: none;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-bar img {
+  max-width: 100%;
+  width: auto;
+  height: 100px;
+}
+
+.nav-links li {
+  font-size: 25px;
+  padding: 0rem 2rem;
+  margin: 2rem 3rem;
+}
+
+.nav-links li a {
+    color: black;
+    text-decoration: none;    
+}
+
+.nav-links li a:hover{
+  background-color: gray;
+  cursor: pointer;
+}

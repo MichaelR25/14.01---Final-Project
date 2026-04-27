@@ -1,23 +1,17 @@
 extends layout
 
-block content
-  h1= title
-  p Welcome to #{title}
-  ol
-  each val in todos
-    li
-      span= val.task + ' - '
-      if val.completed > 0
-        span Completed
-      else
-        span Not Completed
-      form(method='POST' action='/delete')
-        input(type='hidden', name='id', value=val.id)
-        button(type='submit') Delete
+block styles 
+  link(rel='stylesheet', href='/stylesheets/homePageStyle.css')
 
-  hr
-  h2 Add a new task
-  form(method='POST' action='/create')
-    label(for='task') Task:
-    input(type='text', name='task', id='task', required)
-    button(type='submit') Create Task
+block content
+  div.page-content
+    h1.page-title Featured Items
+    ul.product-list
+      each product in featuredProducts
+        li.product-display
+          a.product-link(href=`/products/${product.product_id}`)
+            img.product-image(src= product.product_image)
+            p.product-name= product.product_name + " - $" + product.price
+          p.product-rating= `Rating: ${product.average_rating} Stars`
+    a.order-link(href="https://www.doordash.com/") Order now!
+
