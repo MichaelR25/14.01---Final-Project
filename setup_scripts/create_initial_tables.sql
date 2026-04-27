@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS products (
     price DECIMAL(5,2) NOT NULL,
     product_type VARCHAR(32),
     product_description TEXT,
+    product_image TEXT DEFAULT "../images/coming_soon.png",
     average_rating DECIMAL(3,2)
 );
 

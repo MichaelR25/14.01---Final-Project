@@ -41,4 +41,9 @@ VALUES  (1, 5, "I own the shop and I think I did a pretty good job!"),
         (3, 2, "honesty, i dont know what the owner is thinking. these donuts taste alright ig but its way too expensive"),
         (4, 4, "i think its pretty good");
 
-INSERT INTO products(average_rating) 
+UPDATE products p
+INNER JOIN (SELECT product_id, AVG(rating) as average
+FROM product_reviews
+GROUP BY product_id
+) r ON p.product_id = r.product_id
+SET p.average_rating = r.average;

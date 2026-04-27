@@ -9,6 +9,9 @@ block content
     ul.product-list
       each product in featuredProducts
         li.product-display
-          img.product-image(src= product_image)
-          p= product.product_name + " - $" + product.price
+          a.product-link(href=`/products/${product.product_id}`)
+            img.product-image(src= product.product_image)
+            p.product-name= product.product_name + " - $" + product.price
+          p.product-rating= `Rating: ${product.average_rating} Stars`
+    a.order-link(href="https://www.doordash.com/") Order now!
 
