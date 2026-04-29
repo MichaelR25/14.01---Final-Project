@@ -2,14 +2,20 @@
     margin: 3em;
 }
 
+.product-display {
+    list-style-type: none;
+    width: 250px;
+    margin: 2rem;
+}
+
 .product-list {
     display: flex;
     flex-wrap: wrap;
 }
 
-.product-display {
-    list-style-type: none;
-    margin: 2rem;
+.product-link {
+    display: block;
+    width: 100%;    
 }
 
 .product-image {
