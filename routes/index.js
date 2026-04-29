@@ -18,13 +18,23 @@ router.get('/', function(req, res, next){
 });
 
 router.get('/products/:id', function(req, res, next){
+  const id = parseInt(req.params.id);
   try {
-    req.db.query('SELECT * FROM products WHERE product_id = ? ;', (err, results) => {
+    req.db.query('SELECT * FROM products WHERE product_id = ?;', [id], (err, productResults) => {
       if (err) {
         console.error('Error fetching from database:', err);
         return res.status(500).send('Error fetching from database');
       }
-      res.render('product', { title: 'Downtown Donuts'});
+      req.db.query('select * from product_reviews as p JOIN users on p.user_id = users.user_id  WHERE p.product_id = ?;', [id], (err, reviewResults) => {
+        if (err) {
+          console.error('Error fetching from database:', err);
+          return res.status(500).send('Error fetching from database');
+        }
+        res.render('product', { 
+          title: 'Downtown Donuts',
+          product: productResults[0],
+          reviews: reviewResults});
+        });
     });
   } catch (error) {
     console.error('Error fetching items:', error);
