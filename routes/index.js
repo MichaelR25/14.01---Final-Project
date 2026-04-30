@@ -58,28 +58,17 @@ router.get('/menu', function(req, res, next){
 });
 
 router.get('/about', function(req, res, next){
-  try {
-    req.db.query('SELECT * FROM products;', (err, results) => {
-      if (err) {
-        console.error('Error fetching todos:', err);
-        return res.status(500).send('Error fetching todos');
-      }
-      res.render('about', { title: 'Downtown Donuts'});
-    });
-  } catch (error) {
-    console.error('Error fetching items:', error);
-    res.status(500).send('Error fetching items');
-  }
+    res.render('about', { title: 'Downtown Donuts'});
 });
 
 router.get('/reviews', function(req, res, next){
   try {
-    req.db.query('SELECT * FROM products;', (err, results) => {
+    req.db.query('SELECT * FROM shop_reviews AS p JOIN users ON p.user_id = users.user_id LIMIT 10;', (err, results) => {
       if (err) {
-        console.error('Error fetching todos:', err);
-        return res.status(500).send('Error fetching todos');
+        console.error('Error fetching store reviews:', err);
+        return res.status(500).send('Error fetching store reviews');
       }
-      res.render('store_reviews', { title: 'Downtown Donuts'});
+      res.render('store_reviews', { title: 'Downtown Donuts', reviews: results});
     });
   } catch (error) {
     console.error('Error fetching items:', error);
@@ -87,6 +76,62 @@ router.get('/reviews', function(req, res, next){
   }
 });
 
+router.post('/api/post-review', async function(req, res) {
+  const {userName, id, rating, reviewText} = req.body;
+  const user_id = await getUserId(req.db, userName);
 
+  let query = "";
+  let values = [];
+
+  if(id) {
+    query = 'INSERT INTO product_reviews VALUES (DEFAULT, ?, ?, ?, DEFAULT, ?);';
+    values = [user_id, id, rating, reviewText]        
+  } else {
+    query = 'INSERT INTO shop_reviews VALUES (DEFAULT, ?, ?, DEFAULT, ?);';
+    values = [user_id, rating, reviewText]
+  }
+
+  try {
+    req.db.query(query, values, (err, results) => {
+      if (err) {
+        console.error('Error adding store reviews:', err);
+        return res.status(500).send('Error fetching store reviews');
+      }
+      res.json({message: "Review Posted Successfully!"});
+    });
+  } catch (error) {
+    console.error('Error fetching items:', error);
+    res.status(500).send('Error fetching items');
+  }
+});
+
+async function getUserId(db, userName) {
+  return new Promise(function(resolve, reject) {
+    db.query('SELECT user_id FROM users WHERE user_name = ?', [userName], async (err, results) => {
+      if(err) {
+        reject(err);
+      }  
+      if (results.length == 0) {
+          console.error('User not found! Creating User:...');
+          resolve(await createUser(db, userName));
+      } else {
+        console.log("User Found!")
+        resolve(results[0].user_id)
+      }
+    });
+  });
+}
+
+async function createUser(db, userName) {
+  return new Promise(function(resolve, reject) {
+    db.query('INSERT INTO users(user_name) VALUES (?)', [userName], (err, results) => {
+      if (err) {
+        console.error("Failed to create user!")
+        reject(err);
+      }
+      resolve(results.insertId);
+    });
+  });
+}
 
 module.exports = router;

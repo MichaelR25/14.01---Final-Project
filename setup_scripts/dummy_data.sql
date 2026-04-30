@@ -17,11 +17,11 @@ VALUES  ("Glazed Donut", 1.99, "donut", "Our famous glazed donut! Made in house 
         ("Latte", 2.49, "coffee", "Our famous latte, made with the freshest of milk and coffee! Brewed in house everyday just for you!"),
         ("Americano", 2.49, "coffee", "Our famous americano, with freshly ground espresso everytime! Brewed in house everyday just for you!");
 
-INSERT INTO users(user_name, user_email, password_hash, password_salt)
-VALUES  ("Admin", "admin@downtowndonuts.com", "password123", "admin"),
-        ("Random User", "randomuser@downtowndonuts.com", "password123", "Random User"),
-        ("Another User", "anotheruser@downtowndonuts.com", "password123", "Another User"),
-        ("Clueless User", "cluelessuser@downtowndonuts.com", "password123", "Clueless User");
+INSERT INTO users(user_name)
+VALUES  ("Admin"),
+        ("Random User"),
+        ("Another User"),
+        ("Clueless User");
 
 INSERT INTO product_reviews(user_id, product_id, rating, review_content)
 VALUES  (1, 1, 5, "I love our glazed donuts! Best in the word!"),

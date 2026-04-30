@@ -1,0 +1,39 @@
+mixin reviewLayout(product)
+    script(src='../javascripts/ReviewForm.js')
+    div.reviews
+        h1 Reviews
+        p Please leave a Review!
+        form#review-form
+            label(for="user-name-input")
+                input#user-name-input(type="text" name="userName") 
+            fieldset.review-rating
+                legend Click to leave a rating!
+                label#one-star(for="rating") 
+                    input(type="radio" name="rating" value=1)
+                    | 1 Star
+                label#two-stars(for="rating") 
+                    input(type="radio" name="rating" value=2)
+                    | 2 Stars
+                label#three-stars(for="rating") 
+                    input(type="radio" name="rating" value=3)
+                    | 3 Stars
+                label#four-stars(for="rating") 
+                    input(type="radio" name="rating" value=4)
+                    | 4 Stars
+                label#five-stars(for="rating") 
+                    input(type="radio" name="rating" value=5 checked)
+                    | 5 Stars
+            
+            label(for="review-text") Write a Review:
+                textarea#review-text(name="reviewText")
+            if product
+                input#id(type="hidden" name="id" value=product.product_id)
+            input(type="Submit" value="Submit") 
+            
+        if reviews.length == 0 
+            p No reviews Yet!
+        each review in reviews
+            div.user-reviews
+                p= review.user_name + " " + review.review_date.toDateString()
+                p= review.review_content
+                p= `Rating: ${review.rating} Stars`
