@@ -6,8 +6,8 @@ router.get('/', function(req, res, next){
   try {
     req.db.query('SELECT * FROM products ORDER BY average_rating DESC LIMIT 5;', (err, results) => {
       if (err) {
-        console.error('Error fetching todos:', err);
-        return res.status(500).send('Error fetching todos');
+        console.error('Error fetching products:', err);
+        return res.status(500).send('Error fetching products');
       }
       res.render('index', { title: 'Downtown Donuts', featuredProducts: results});
     });
@@ -19,10 +19,10 @@ router.get('/', function(req, res, next){
 
 router.get('/products/:id', function(req, res, next){
   try {
-    req.db.query('SELECT * FROM products;', (err, results) => {
+    req.db.query('SELECT * FROM products WHERE product_id = ? ;', (err, results) => {
       if (err) {
-        console.error('Error fetching todos:', err);
-        return res.status(500).send('Error fetching todos');
+        console.error('Error fetching from database:', err);
+        return res.status(500).send('Error fetching from database');
       }
       res.render('product', { title: 'Downtown Donuts'});
     });
@@ -36,10 +36,10 @@ router.get('/menu', function(req, res, next){
   try {
     req.db.query('SELECT * FROM products;', (err, results) => {
       if (err) {
-        console.error('Error fetching todos:', err);
-        return res.status(500).send('Error fetching todos');
+        console.error('Error fetching from database:', err);
+        return res.status(500).send('Error fetching from database');
       }
-      res.render('menu', { title: 'Downtown Donuts'});
+      res.render('menu', { title: 'Downtown Donuts', featuredProducts: results});
     });
   } catch (error) {
     console.error('Error fetching items:', error);

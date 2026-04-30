@@ -1,3 +1,32 @@
 extends layout
 
+block styles 
+  link(rel='stylesheet', href='/stylesheets/Product_Display_Style.css')
+  link(rel='stylesheet', href='/stylesheets/Menu_Style.css')
+  script(src='/javascripts/Menu_Page_Buttons.js' defer)
 block content
+    div.page-content
+        h1.page-title Menu
+        button#show-filters Filters
+        form#filter-form.hidden.form-style
+            label(for="donut-filter")
+                input#donut-filter(type="checkbox" name="category"  value="donut" checked)
+                | Single Donuts
+            label(for="box-filter") 
+                input#box-filter(type="checkbox" name="category" value="box" checked)
+                | Boxes
+            label(for="coffee-filter")
+                input#coffee-filter(type="checkbox" name="category" value="coffee" checked)
+                | Coffee
+            
+        ul.product-list
+            each product in featuredProducts
+                    li.product-display
+                        a.product-link(href=`/products/${product.product_id}`)
+                            img.product-image(src= product.product_image)
+                            p.product-name= product.product_name + " - $" + product.price
+                        if product.average_rating == NULL
+                            p.product-rating= 'Rating not available!'
+                        else
+                            p.product-rating= `Rating: ${product.average_rating} Stars`
+
