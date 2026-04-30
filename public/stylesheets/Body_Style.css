@@ -4,6 +4,9 @@ body {
   color: #F7F7F7;
 }
 
+.page-content {
+    margin: 3em;
+}
 
 .montserrat-normal {
   font-family: "Montserrat", sans-serif;
@@ -15,7 +18,7 @@ body {
 .montserrat-title {
   font-family: "Montserrat", sans-serif;
   font-optical-sizing: auto;
-  font-weight: 400;
+  font-weight: 700;
   font-style: normal;
 }
 a{
