@@ -12,13 +12,14 @@ CREATE TABLE IF NOT EXISTS products (
     average_rating DECIMAL(3,2)
 );
 
+-- UNIMPLEMENTED: LOGIN SYSTEM
 CREATE TABLE IF NOT EXISTS users (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
     user_name VARCHAR(30) NOT NULL UNIQUE,
-    user_email VARCHAR(256) NOT NULL,
-    join_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-    password_hash VARCHAR(255) NOT NULL,
-    password_salt VARCHAR(64) NOT NULL
+    -- user_email VARCHAR(256) NOT NULL,
+    join_date DATETIME DEFAULT CURRENT_TIMESTAMP
+    -- password_hash VARCHAR(255) NOT NULL,
+    -- password_salt VARCHAR(64) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS product_reviews (

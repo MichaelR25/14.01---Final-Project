@@ -1,5 +1,4 @@
 .nav-bar {
-  padding: 0.5rem 1rem;
   background-color: white;
 }
 
@@ -9,6 +8,7 @@
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
+  margin: 0px;
 }
 
 .nav-bar img {
@@ -20,7 +20,6 @@
 .nav-links li {
   font-size: 25px;
   padding: 0rem 2rem;
-  margin: 2rem 3rem;
 }
 
 .nav-links li a {

@@ -62,3 +62,5 @@ forwarded port in your browser to view the application.
 ## Resources used
 
 https://fonts.google.com/selection/embed
+https://www.youtube.com/watch?v=fGYQJAlLD68
+https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status#client_error_responses

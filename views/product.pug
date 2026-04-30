@@ -1,3 +1,14 @@
 extends layout
+include reviews_layout.pug
+block styles 
+    link(rel='stylesheet', href='../stylesheets/Product_Page_Style.css')
 
 block content
+    main.product-showcase
+        img.product-img(src=product.product_image)
+        div.product-text
+            h1.product-name= product.product_name
+            p.product-description= product.product_description
+            p.product-rating= `Rating: ${product.average_rating} Stars`
+
+    +reviewLayout(product)
