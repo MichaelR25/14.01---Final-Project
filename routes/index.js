@@ -21,15 +21,19 @@ router.get('/', function(req, res, next){
  * Gets product data based on the id from the database, and sends the data with the 
  * product pug view
 */
-router.get('/products/:id', function(req, res, next){
+router.get('/products/:id', async function(req, res, next){
+  const limit = 5;
+  let currentPage = parseInt(req.query.page) || 1;
   const id = parseInt(req.params.id);
+  const offset = (currentPage - 1) * limit;
+  let pageCount = Math.ceil((await getReviewCount(req.db, id) / limit)); 
   try {
     req.db.query('SELECT * FROM products WHERE product_id = ?;', [id], (err, productResults) => {
       if (err) {
         console.error('Error fetching from database:', err);
         return res.status(500).send('Error fetching from database');
       }
-      req.db.query('SELECT * FROM product_reviews AS p JOIN users ON p.user_id = users.user_id  WHERE p.product_id = ?;', [id], (err, reviewResults) => {
+      req.db.query('SELECT * FROM product_reviews AS p JOIN users ON p.user_id = users.user_id  WHERE p.product_id = ? ORDER BY review_date DESC LIMIT ? OFFSET ?;', [id, limit, offset], (err, reviewResults) => {
         if (err) {
           console.error('Error fetching from database:', err);
           return res.status(500).send('Error fetching from database');
@@ -37,7 +41,12 @@ router.get('/products/:id', function(req, res, next){
         res.render('product', { 
           title: 'Downtown Donuts',
           product: productResults[0],
-          reviews: reviewResults});
+          reviews: reviewResults,
+          current_page: currentPage, 
+          next_page: currentPage + 1, 
+          previous_page: currentPage - 1,
+          max_pages: pageCount});
+          
         });
     });
   } catch (error) {
@@ -68,15 +77,24 @@ router.get('/about', function(req, res, next){
 });
 
 /* Gets the reviews specifically for the store and responds with the store_reviews page*/
-router.get('/reviews', function(req, res, next){
-  let offset = 5;
+router.get('/reviews', async function(req, res, next){
+  let currentPage = parseInt(req.query.page) || 1;
+  let pageCount = Math.ceil((await getReviewCount(req.db, null) / 10)); 
+  const limit = 10;
+  const offset = (currentPage - 1) * limit;
+  console.log(pageCount);
   try {
-    req.db.query('SELECT * FROM shop_reviews AS p JOIN users ON p.user_id = users.user_id LIMIT 5 OFFSET 0;', [offset], (err, results) => {
+    req.db.query('SELECT * FROM shop_reviews AS p JOIN users ON p.user_id = users.user_id ORDER BY review_date DESC LIMIT 10 OFFSET ?;', [offset], (err, results) => {
       if (err) {
         console.error('Error fetching store reviews:', err);
         return res.status(500).send('Error fetching store reviews');
       }
-      res.render('store_reviews', { title: 'Downtown Donuts', reviews: results});
+      res.render('store_reviews', { title: 'Downtown Donuts',
+                                    reviews: results,
+                                    current_page: currentPage, 
+                                    next_page: currentPage + 1, 
+                                    previous_page: currentPage - 1,
+                                    max_pages: pageCount}); 
     });
   } catch (error) {
     console.error('Error fetching items:', error);
@@ -112,7 +130,7 @@ router.post('/api/post-review', async function(req, res) {
         return res.status(500).send('Error fetching store reviews');
       }
       res.json({message: "Review Posted Successfully!"});
-      updateAverage(req.db, id);
+      updateProductAverage(req.db, id);
     });
   } catch (error) {
     console.error('Error fetching items:', error);
@@ -120,6 +138,10 @@ router.post('/api/post-review', async function(req, res) {
   }
 });
 
+/* Helper method to get the user_id of a given user_name
+ * If the user_name is not found, a new user is created
+ * returns the id of the user if found, otherwise the id of the new user
+*/
 async function getUserId(db, userName) {
   return new Promise(function(resolve, reject) {
     db.query('SELECT user_id FROM users WHERE user_name = ?', [userName], async (err, results) => {
@@ -137,6 +159,13 @@ async function getUserId(db, userName) {
   });
 }
 
+/** Helper method to create a new user
+ * returns 
+ * 
+ * @param {*} db 
+ * @param {*} userName 
+ * @returns a Promise Object containing the id of the new user
+ */
 async function createUser(db, userName) {
   return new Promise(function(resolve, reject) {
     db.query('INSERT INTO users(user_name) VALUES (?)', [userName], (err, results) => {
@@ -149,7 +178,12 @@ async function createUser(db, userName) {
   });
 }
 
-async function updateAverage(db, id) {
+/** Helper method to update the average rating of a product
+ * 
+ * @param {object} db 
+ * @param {int} id 
+ */
+async function updateProductAverage(db, id) {
   const query = `
     UPDATE products p 
     INNER JOIN (
@@ -165,6 +199,33 @@ async function updateAverage(db, id) {
         console.error("Failed to update averages!")
       } 
   });
+}
+
+/** Helper method to make a database request to get the number of reviews of a given page
+ * 
+ * @param {object} db - A database connection
+ * @param {int} id - A product_id, or null for shop_reviews
+ * @returns a Promise obect containing the number of reviews found
+ */
+async function getReviewCount(db, id) {
+  let query = '';
+  let data = []
+  // If a product id is given, search the product_reviews table
+  // Otherwise, search the shop_reviews table
+  if(id) {
+    query = 'SELECT COUNT(*) AS max FROM product_reviews WHERE product_id = ?';
+    data = [id];
+  } else {
+    query = 'SELECT COUNT(*) AS max FROM shop_reviews';
+  }
+  return new Promise(function(resolve, reject) {
+    db.query(query, data, (err, results) => {
+      if (err) {
+        reject(err);
+      }
+      resolve(results[0].max);
+    });
+  }); 
 }
 
 module.exports = router;

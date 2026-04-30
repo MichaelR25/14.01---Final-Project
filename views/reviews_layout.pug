@@ -1,8 +1,8 @@
-mixin reviewLayout(product)
+mixin reviewLayout(product, page_type)
     script(src='../javascripts/ReviewForm.js')
     link(rel='stylesheet' href="../stylesheets/Reviews_Style.css")
     section.reviews
-        h1 Reviews
+        h1= `${page_type} Reviews`
         p Please leave a Review!
         form#review-form
             label(for="user-name-input") Enter a username: 
@@ -38,3 +38,16 @@ mixin reviewLayout(product)
                 p.review-name-and-date= review.user_name + " on " + review.review_date.toDateString()
                 p.review-content= review.review_content
                 p.review-rating= `Rating: ${review.rating} Stars`
+
+        div.page-buttons
+            if current_page > 1 
+                a.change-page(href=`?page=${previous_page}`) Previous Page
+            else
+                p.change-page Previous Page
+
+            p.change-page= `Page: ${current_page} of ${max_pages}`
+            
+            if current_page < max_pages
+                a.change-page(href=`?page=${next_page}`) Next Page
+            else
+                p.change-page Next Page
