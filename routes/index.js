@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 
-/* GET home page. */
+/* Gets the top 5 menu items and the landing page*/
 router.get('/', function(req, res, next){
   try {
     req.db.query('SELECT * FROM products ORDER BY average_rating DESC LIMIT 5;', (err, results) => {
@@ -17,6 +17,10 @@ router.get('/', function(req, res, next){
   }
 });
 
+/* 
+ * Gets product data based on the id from the database, and sends the data with the 
+ * product pug view
+*/
 router.get('/products/:id', function(req, res, next){
   const id = parseInt(req.params.id);
   try {
@@ -25,7 +29,7 @@ router.get('/products/:id', function(req, res, next){
         console.error('Error fetching from database:', err);
         return res.status(500).send('Error fetching from database');
       }
-      req.db.query('select * from product_reviews as p JOIN users on p.user_id = users.user_id  WHERE p.product_id = ?;', [id], (err, reviewResults) => {
+      req.db.query('SELECT * FROM product_reviews AS p JOIN users ON p.user_id = users.user_id  WHERE p.product_id = ?;', [id], (err, reviewResults) => {
         if (err) {
           console.error('Error fetching from database:', err);
           return res.status(500).send('Error fetching from database');
@@ -42,6 +46,7 @@ router.get('/products/:id', function(req, res, next){
   }
 });
 
+/* Gets all the products from the menu and dispalys them on the menu page */
 router.get('/menu', function(req, res, next){
   try {
     req.db.query('SELECT * FROM products;', (err, results) => {
@@ -57,13 +62,16 @@ router.get('/menu', function(req, res, next){
   }
 });
 
+/* Gets the about page */
 router.get('/about', function(req, res, next){
     res.render('about', { title: 'Downtown Donuts'});
 });
 
+/* Gets the reviews specifically for the store and responds with the store_reviews page*/
 router.get('/reviews', function(req, res, next){
+  let offset = 5;
   try {
-    req.db.query('SELECT * FROM shop_reviews AS p JOIN users ON p.user_id = users.user_id LIMIT 10;', (err, results) => {
+    req.db.query('SELECT * FROM shop_reviews AS p JOIN users ON p.user_id = users.user_id LIMIT 5 OFFSET 0;', [offset], (err, results) => {
       if (err) {
         console.error('Error fetching store reviews:', err);
         return res.status(500).send('Error fetching store reviews');
@@ -76,6 +84,7 @@ router.get('/reviews', function(req, res, next){
   }
 });
 
+/* Posts the sent user review after sanitizing the data*/
 router.post('/api/post-review', async function(req, res) {
   const {userName, id, rating, reviewText} = req.body;
   const user_id = await getUserId(req.db, userName);
@@ -83,6 +92,11 @@ router.post('/api/post-review', async function(req, res) {
   let query = "";
   let values = [];
 
+  if(userName.length <= 0) {
+    return res.status()
+  }
+
+  // Determine if the review is being posted to the product or to the store
   if(id) {
     query = 'INSERT INTO product_reviews VALUES (DEFAULT, ?, ?, ?, DEFAULT, ?);';
     values = [user_id, id, rating, reviewText]        
@@ -98,6 +112,7 @@ router.post('/api/post-review', async function(req, res) {
         return res.status(500).send('Error fetching store reviews');
       }
       res.json({message: "Review Posted Successfully!"});
+      updateAverage(req.db, id);
     });
   } catch (error) {
     console.error('Error fetching items:', error);
@@ -131,6 +146,24 @@ async function createUser(db, userName) {
       }
       resolve(results.insertId);
     });
+  });
+}
+
+async function updateAverage(db, id) {
+  const query = `
+    UPDATE products p 
+    INNER JOIN (
+      SELECT product_id, AVG(rating) AS average
+      FROM product_reviews
+      WHERE product_id = ?) r 
+      ON p.product_id = r.product_id
+      SET p.average_rating = r.average;
+  `;
+  
+  db.query(query, [id], (err, results) => {
+      if (err) {
+        console.error("Failed to update averages!")
+      } 
   });
 }
 

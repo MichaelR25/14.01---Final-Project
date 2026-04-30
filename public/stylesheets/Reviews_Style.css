@@ -1,0 +1,14 @@
+.reviews {
+    margin: 2%;
+}
+
+.review-text-label {
+    display: block;
+}
+.user-reviews {
+    margin: 3%;
+}
+
+.review-name-and-date {
+    font-size: 24px
+}
