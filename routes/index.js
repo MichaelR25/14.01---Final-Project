@@ -6,7 +6,7 @@ router.get('/', function(req, res, next){
   req.db.query('SELECT * FROM products ORDER BY average_rating DESC LIMIT 5;', (err, results) => {
     if (err) {
       console.error('Error fetching products:', err);
-      err.message = "Error fetching products!";
+      err.message = "Error fetching featured products!";
       err.status = 500;
       return next(err);
     }
@@ -28,34 +28,34 @@ router.get('/products/:id', async function(req, res, next){
   try {
     const reviewCount = await getReviewCount(req.db, id);
     let pageCount = reviewCount === 0 ? 1 : Math.ceil(reviewCount / limit);
-     req.db.query('SELECT * FROM products WHERE product_id = ?;', [id], (err, productResults) => {
-    if (err) {
-      console.error(`Error fetching product with id ${id}: ${err}`);
-      err.message = "Error: Product not found!";
-      err.status = 500;
-      return next(err);
-    }
-
-    req.db.query('SELECT * FROM product_reviews AS p JOIN users ON p.user_id = users.user_id  WHERE p.product_id = ? ORDER BY review_date DESC LIMIT ? OFFSET ?;', [id, limit, offset], (err, reviewResults) => {
+    req.db.query('SELECT * FROM products WHERE product_id = ?;', [id], (err, productResults) => {
       if (err) {
         console.error(`Error fetching product with id ${id}: ${err}`);
-        err.message = "Message: Product not found!";
+        err.message = "Error: Product not found!";
         err.status = 500;
         return next(err);
       }
-      res.render('product', { 
-        title: 'Downtown Donuts - ' + productResults[0].product_name,
-        product: productResults[0],
-        reviews: reviewResults,
-        current_page: currentPage, 
-        next_page: currentPage + 1, 
-        previous_page: currentPage - 1,
-        max_pages: pageCount});
-      });
+
+      req.db.query('SELECT * FROM product_reviews AS p JOIN users ON p.user_id = users.user_id  WHERE p.product_id = ? ORDER BY review_date DESC LIMIT ? OFFSET ?;', [id, limit, offset], (err, reviewResults) => {
+        if (err) {
+          console.error(`Error fetching product with id ${id}: ${err}`);
+          err.message = "Message: Product not found!";
+          err.status = 500;
+          return next(err);
+        }
+        res.render('product', { 
+          title: 'Downtown Donuts - ' + productResults[0].product_name,
+          product: productResults[0],
+          reviews: reviewResults,
+          current_page: currentPage, 
+          next_page: currentPage + 1, 
+          previous_page: currentPage - 1,
+          max_pages: pageCount});
+        });
     });
   } catch (err) {
     console.error(`Error posting review: ${err}`);
-    err.message = "Message: Reivew failed to post!";
+    err.message = "Message: Database refused to connect!";
     err.status = 500;
     return next(err);
   }
@@ -85,7 +85,6 @@ router.get('/reviews', async function(req, res, next){
   const limit = 5;
   const offset = (currentPage - 1) * limit;
  
-  
   try {
     const reviewCount = await getReviewCount(req.db, id);
     let pageCount = reviewCount === 0 ? 1 : Math.ceil(reviewCount / limit);
@@ -105,7 +104,7 @@ router.get('/reviews', async function(req, res, next){
     });
   } catch (err) {
     console.error(`Error posting review: ${err}`);
-    err.message = "Message: Reivew failed to post!";
+    err.message = "Message: Error fetching store reviews! Database refused to respond";
     err.status = 500;
     return next(err);
   }
@@ -123,6 +122,16 @@ router.post('/api/post-review', async function(req, res, next) {
     return res.sendStatus(400);
   }
 
+  if(userName.length > 30) {
+    console.error(`Error: Username is too long! Must be 30 characters or less`);
+    return res.sendStatus(400);
+  }
+
+  if(reviewText.length > 300) {
+    console.error(`Error: Review is too long! Must be 300 characters or less`);
+    return res.sendStatus(400);
+  }
+
   try {
     const user_id = await getUserId(req.db, userName);
 
@@ -137,7 +146,7 @@ router.post('/api/post-review', async function(req, res, next) {
     req.db.query(query, values, (err, results) => {
       if (err) {
         console.error(`Error posting review: ${err}`);
-        err.message = "Message: Reivew failed to post!";
+        err.message = "Message: Review failed to post!";
         err.status = 500;
         return next(err);
       }
@@ -147,7 +156,7 @@ router.post('/api/post-review', async function(req, res, next) {
     });
   } catch (err) {
     console.error(`Error posting review: ${err}`);
-    err.message = "Message: Reivew failed to post!";
+    err.message = "Message: Review failed to post!";
     err.status = 500;
     return next(err);
   }

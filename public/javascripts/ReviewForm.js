@@ -15,6 +15,12 @@ document.addEventListener("DOMContentLoaded", function() {
         if(userName == "") {
             document.querySelector("#user-name-input").focus();
             postFailed(reviewForm, errorText, "Username can't be empty!")
+        } else if (userName.length > 30) {
+            document.querySelector("#review-text").focus();
+            postFailed(reviewForm, errorText, "Username is too long! Username must be 30 characters or less. Character Count: " + userName.length)
+        } else if (reviewText.length > 300) {
+            document.querySelector("#review-text").focus();
+            postFailed(reviewForm, errorText, "Review is too long! Reivew must be 300 characters or less. Character Count: " + reviewText.length)
         } else {
             try {
                 const response = await fetch("/api/post-review", {
