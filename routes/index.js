@@ -86,7 +86,7 @@ router.get('/reviews', async function(req, res, next){
   const offset = (currentPage - 1) * limit;
  
   try {
-    const reviewCount = await getReviewCount(req.db, id);
+    const reviewCount = await getReviewCount(req.db, null);
     let pageCount = reviewCount === 0 ? 1 : Math.ceil(reviewCount / limit);
     req.db.query('SELECT * FROM shop_reviews AS p JOIN users ON p.user_id = users.user_id ORDER BY review_date DESC LIMIT ? OFFSET ?;', [limit, offset], (err, results) => {
     if (err) {

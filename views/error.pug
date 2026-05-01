@@ -1,9 +1,10 @@
 extends layout
 
 block content
-  h1 Uh Oh! Looks like something went wrong! 
-  h2= `Error code: ${error.status}`
-  h2= message
-  h3 Please try again later or try some of these links:
-  a.error-link(href="/menu") Menu 
-  a.error-link(href="/") Home
+  main.page-content
+    h1 Uh Oh! Looks like something went wrong! 
+    h2= `Error code: ${error.status}`
+    h2= message
+    h3 Please try again later or try some of these links:
+    a.error-link(href="/") Home
+    a.error-link(href="/menu") Menu 
