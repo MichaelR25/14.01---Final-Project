@@ -2,141 +2,156 @@ var express = require('express');
 var router = express.Router();
 
 /* Gets the top 5 menu items and the landing page*/
-router.get('/', function(req, res){
-  try {
-    req.db.query('SELECT * FROM products ORDER BY average_rating DESC LIMIT 5;', (err, results) => {
-      if (err) {
-        console.error('Error fetching products:', err);
-        return res.status(500).send('Error fetching products');
-      }
-      res.render('index', { title: 'Downtown Donuts', featuredProducts: results});
-    });
-  } catch (error) {
-    console.error('Error fetching items:', error);
-    res.status(500).send('Error fetching items');
-  }
+router.get('/', function(req, res, next){
+  req.db.query('SELECT * FROM products ORDER BY average_rating DESC LIMIT 5;', (err, results) => {
+    if (err) {
+      console.error('Error fetching products:', err);
+      err.message = "Error fetching products!";
+      err.status = 500;
+      return next(err);
+    }
+    res.render('index', { title: 'Downtown Donuts', featuredProducts: results});
+  });
 });
 
 /* 
  * Gets product data based on the id from the database, and sends the data with the 
  * product pug view
 */
-router.get('/products/:id', async function(req, res){
+router.get('/products/:id', async function(req, res, next){
   const limit = 5;
   let currentPage = parseInt(req.query.page) || 1;
   const id = parseInt(req.params.id);
   const offset = (currentPage - 1) * limit;
-  let pageCount = Math.ceil((await getReviewCount(req.db, id) / limit)); 
+  
+  
   try {
-    req.db.query('SELECT * FROM products WHERE product_id = ?;', [id], (err, productResults) => {
+    const reviewCount = await getReviewCount(req.db, id);
+    let pageCount = reviewCount === 0 ? 1 : Math.ceil(reviewCount / limit);
+     req.db.query('SELECT * FROM products WHERE product_id = ?;', [id], (err, productResults) => {
+    if (err) {
+      console.error(`Error fetching product with id ${id}: ${err}`);
+      err.message = "Error: Product not found!";
+      err.status = 500;
+      return next(err);
+    }
+
+    req.db.query('SELECT * FROM product_reviews AS p JOIN users ON p.user_id = users.user_id  WHERE p.product_id = ? ORDER BY review_date DESC LIMIT ? OFFSET ?;', [id, limit, offset], (err, reviewResults) => {
       if (err) {
-        console.error('Error fetching from database:', err);
-        return res.status(500).send('Error fetching from database');
+        console.error(`Error fetching product with id ${id}: ${err}`);
+        err.message = "Message: Product not found!";
+        err.status = 500;
+        return next(err);
       }
-      req.db.query('SELECT * FROM product_reviews AS p JOIN users ON p.user_id = users.user_id  WHERE p.product_id = ? ORDER BY review_date DESC LIMIT ? OFFSET ?;', [id, limit, offset], (err, reviewResults) => {
-        if (err) {
-          console.error('Error fetching from database:', err);
-          return res.status(500).send('Error fetching from database');
-        }
-        res.render('product', { 
-          title: 'Downtown Donuts',
-          product: productResults[0],
-          reviews: reviewResults,
-          current_page: currentPage, 
-          next_page: currentPage + 1, 
-          previous_page: currentPage - 1,
-          max_pages: pageCount});
-          
-        });
+      res.render('product', { 
+        title: 'Downtown Donuts - ' + productResults[0].product_name,
+        product: productResults[0],
+        reviews: reviewResults,
+        current_page: currentPage, 
+        next_page: currentPage + 1, 
+        previous_page: currentPage - 1,
+        max_pages: pageCount});
+      });
     });
-  } catch (error) {
-    console.error('Error fetching items:', error);
-    res.status(500).send('Error fetching items');
+  } catch (err) {
+    console.error(`Error posting review: ${err}`);
+    err.message = "Message: Reivew failed to post!";
+    err.status = 500;
+    return next(err);
   }
 });
 
 /* Gets all the products from the menu and dispalys them on the menu page */
 router.get('/menu', function(req, res, next){
-  try {
-    req.db.query('SELECT * FROM products;', (err, results) => {
-      if (err) {
-        console.error('Error fetching from database:', err);
-        return res.status(500).send('Error fetching from database');
-      }
-      res.render('menu', { title: 'Downtown Donuts', featuredProducts: results});
-    });
-  } catch (error) {
-    console.error('Error fetching items:', error);
-    res.status(500).send('Error fetching items');
-  }
+  req.db.query('SELECT * FROM products;', (err, results) => {
+    if (err) {
+        console.error(`Error fetching menu: ${err}`);
+        err.message = "Message: Menu failed to load!";
+        err.status = 500;
+        return next(err);
+    }
+    res.render('menu', { title: 'Downtown Donuts - Menu', featuredProducts: results});
+  });
 });
 
 /* Gets the about page */
-router.get('/about', function(req, res){
-    res.render('about', { title: 'Downtown Donuts'});
+router.get('/about', function(req, res, next){
+    res.render('about', { title: 'Downtown Donuts - About'});
 });
 
 /* Gets the reviews specifically for the store and responds with the store_reviews page*/
-router.get('/reviews', async function(req, res){
+router.get('/reviews', async function(req, res, next){
   let currentPage = parseInt(req.query.page) || 1;
   const limit = 5;
   const offset = (currentPage - 1) * limit;
-  let pageCount = Math.ceil((await getReviewCount(req.db, null) / limit)); 
-  console.log(pageCount);
+ 
+  
   try {
+    const reviewCount = await getReviewCount(req.db, id);
+    let pageCount = reviewCount === 0 ? 1 : Math.ceil(reviewCount / limit);
     req.db.query('SELECT * FROM shop_reviews AS p JOIN users ON p.user_id = users.user_id ORDER BY review_date DESC LIMIT ? OFFSET ?;', [limit, offset], (err, results) => {
-      if (err) {
-        console.error('Error fetching store reviews:', err);
-        return res.status(500).send('Error fetching store reviews');
-      }
-      res.render('store_reviews', { title: 'Downtown Donuts',
-                                    reviews: results,
-                                    current_page: currentPage, 
-                                    next_page: currentPage + 1, 
-                                    previous_page: currentPage - 1,
-                                    max_pages: pageCount}); 
+    if (err) {
+        console.error(`Error fetching shop reviews: ${err}`);
+        err.message = "Message: Shop reviews failed to load!";
+        err.status = 500;
+        return next(err);
+    }
+    res.render('store_reviews', { title: 'Downtown Donuts',
+                                  reviews: results,
+                                  current_page: currentPage, 
+                                  next_page: currentPage + 1, 
+                                  previous_page: currentPage - 1,
+                                  max_pages: pageCount}); 
     });
-  } catch (error) {
-    console.error('Error fetching items:', error);
-    res.status(500).send('Error fetching items');
+  } catch (err) {
+    console.error(`Error posting review: ${err}`);
+    err.message = "Message: Reivew failed to post!";
+    err.status = 500;
+    return next(err);
   }
+  
 });
 
-/* Posts the sent user review after sanitizing the data*/
-router.post('/api/post-review', async function(req, res) {
+/* Posts the sent user review after validating the data*/
+router.post('/api/post-review', async function(req, res, next) {
   const {userName, id, rating, reviewText} = req.body;
-  const user_id = await getUserId(req.db, userName);
-
   let query = "";
   let values = [];
 
   if(userName.length <= 0) {
-    return res.status()
-  }
-
-  // Determine if the review is being posted to the product or to the store
-  if(id) {
-    query = 'INSERT INTO product_reviews VALUES (DEFAULT, ?, ?, ?, DEFAULT, ?);';
-    values = [user_id, id, rating, reviewText]        
-  } else {
-    query = 'INSERT INTO shop_reviews VALUES (DEFAULT, ?, ?, DEFAULT, ?);';
-    values = [user_id, rating, reviewText]
+    console.error(`Error: Username is empty!`);
+    return res.sendStatus(400);
   }
 
   try {
+    const user_id = await getUserId(req.db, userName);
+
+    // Determine if the review is being posted to a product or to the store
+    if(id) {
+      query = 'INSERT INTO product_reviews VALUES (DEFAULT, ?, ?, ?, DEFAULT, ?);';
+      values = [user_id, id, rating, reviewText]        
+    } else {
+      query = 'INSERT INTO shop_reviews VALUES (DEFAULT, ?, ?, DEFAULT, ?);';
+      values = [user_id, rating, reviewText]
+    }
     req.db.query(query, values, (err, results) => {
       if (err) {
-        console.error('Error adding store reviews:', err);
-        return res.status(500).send('Error fetching store reviews');
+        console.error(`Error posting review: ${err}`);
+        err.message = "Message: Reivew failed to post!";
+        err.status = 500;
+        return next(err);
       }
       console.log("Review Posted Successfully for product: " + id);
       res.json({message: "Review Posted Successfully!"});
       updateProductAverage(req.db, id);
     });
-  } catch (error) {
-    console.error('Error fetching items:', error);
-    res.status(500).send('Error fetching items');
+  } catch (err) {
+    console.error(`Error posting review: ${err}`);
+    err.message = "Message: Reivew failed to post!";
+    err.status = 500;
+    return next(err);
   }
+  
 });
 
 /* Helper method to get the user_id of a given user_name
@@ -147,7 +162,7 @@ async function getUserId(db, userName) {
   return new Promise(function(resolve, reject) {
     db.query('SELECT user_id FROM users WHERE user_name = ?', [userName], async (err, results) => {
       if(err) {
-        reject(err);
+        return reject(err);
       }  
       if (results.length == 0) {
           console.error('User not found! Creating User:...');
@@ -172,7 +187,7 @@ async function createUser(db, userName) {
     db.query('INSERT INTO users(user_name) VALUES (?)', [userName], (err, results) => {
       if (err) {
         console.error("Failed to create user!")
-        reject(err);
+        return reject(err);
       }
       resolve(results.insertId);
     });
@@ -222,7 +237,7 @@ async function getReviewCount(db, id) {
   return new Promise(function(resolve, reject) {
     db.query(query, data, (err, results) => {
       if (err) {
-        reject(err);
+        return reject(err);
       }
       resolve(results[0].max);
     });

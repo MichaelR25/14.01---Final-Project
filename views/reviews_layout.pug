@@ -23,10 +23,11 @@ mixin reviewLayout(product, page_type)
                     input#five-stars(type="radio" name="rating" value=5 checked)
                     | 5 Stars
             
-            label.review-text-label(for="review-text") Write a Review:
+            label.review-text-label(for="review-text") Write a Review (Optional):
                 textarea#review-text(name="reviewText")
             if product
                 input#id(type="hidden" name="id" value=product.product_id)
+            p.hidden#error-box Error: 
             input(type="Submit" value="Submit") 
             
         if reviews.length == 0 
