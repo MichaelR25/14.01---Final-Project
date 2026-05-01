@@ -4,21 +4,58 @@
 
 .review-text-label {
     display: block;
+    margin: 10px 0px;
 }
+
+.review-text-area {
+    display: block;
+    width: 100%;
+    max-width: 500px;
+    height: 100px;
+    padding: 10px;
+    margin: 10px;
+    box-sizing: border-box;
+}
+
+.review-rating {
+    margin: 10px;
+    max-width: 500px;
+    width: 100%;
+}
+
 .user-reviews {
     margin: 3%;
 }
 
-.review-name-and-date {
+.user-review-name-and-date {
     font-size: 24px
 }
 
 .page-buttons {
     display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .change-page {
-    padding-right: 50px; 
+    padding-right: 50px;
+    border: 3px solid #7e7f9a;
+    padding: .5rem;
+    margin: 1rem;
+    color: #f7c64A;
+    border-radius: 6px;
+}
+
+.inactive {
+    padding-right: 50px;
+    padding: .5rem;
+    margin: 1rem;
+    color: #F7F7F7;
+    border-radius: 6px;  
+}
+
+.inactive:hover {
+    cursor: not-allowed;
 }
 
 .post-failed {

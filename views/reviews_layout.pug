@@ -24,7 +24,7 @@ mixin reviewLayout(product, page_type)
                     | 5 Stars
             
             label.review-text-label(for="review-text") Write a Review (Optional):
-                textarea#review-text(name="reviewText")
+            textarea#review-text.review-text-area(name="reviewText")
             if product
                 input#id(type="hidden" name="id" value=product.product_id)
             p.hidden#error-box Error: 
@@ -34,19 +34,19 @@ mixin reviewLayout(product, page_type)
             p No reviews Yet!
         each review in reviews
             div.user-reviews
-                h1.review-name-and-date= review.user_name + " on " + review.review_date.toDateString()
-                p.review-content= review.review_content
-                p.review-rating= `Rating: ${review.rating} Stars`
+                h1.user-review-name-and-date= review.user_name + " on " + review.review_date.toDateString()
+                p.user-review-content= review.review_content
+                p.user-review-rating= `Rating: ${review.rating} Stars`
 
         div.page-buttons
             if current_page > 1 
                 a.change-page(href=`?page=${previous_page}`) Previous Page
             else
-                p.change-page Previous Page
+                p.change-page.inactive Previous Page
 
-            p.change-page= `Page: ${current_page} of ${max_pages}`
+            p= `Page: ${current_page} of ${max_pages}`
             
             if current_page < max_pages
                 a.change-page(href=`?page=${next_page}`) Next Page
             else
-                p.change-page Next Page
+                p.change-page.inactive Next Page

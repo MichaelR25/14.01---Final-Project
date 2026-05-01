@@ -1,9 +1,10 @@
 extends layout
-
+include reviews_layout
 block links
     link(rel='stylesheet' href="../stylesheets/Reviews_Style.css")
     script(src='../javascripts/ReviewForm.js')
 
 block content
-    include reviews_layout
+    main.page-content
+        h1 Read what customers think about store, or leave a review of your own!
     +reviewLayout(null, "Store ")
