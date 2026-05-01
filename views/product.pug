@@ -1,14 +1,19 @@
 extends layout
 include reviews_layout.pug
-block styles 
+block links 
     link(rel='stylesheet', href='../stylesheets/Product_Page_Style.css')
+    link(rel='stylesheet' href="../stylesheets/Reviews_Style.css")
+    script(src='../javascripts/ReviewForm.js')
 
 block content
     main.product-showcase
-        img.product-img(src=product.product_image)
+        img.product-img(src=product.product_image alt=`Product ${product.product_name}`)
         div.product-text
             h1.product-name= product.product_name
             p.product-description= product.product_description
-            p.product-rating= `Rating: ${product.average_rating} Stars`
+            if product.average_rating == NULL
+                p.product-rating= `Rating: No ratings yet!`
+            else
+                p.product-rating= `Rating: ${product.average_rating} Stars`
 
     +reviewLayout(product, 'Product')

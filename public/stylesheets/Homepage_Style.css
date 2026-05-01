@@ -1,0 +1,13 @@
+.order-services {
+    padding: 5px;
+    margin: 50px;
+}
+
+.order-link {
+    border: 3px solid #7e7f9a;
+    padding: .5rem;
+    margin: 1rem;
+    color: #f7c64A;
+    border-color: #7e7f9a;
+    border-radius: 6px;
+}

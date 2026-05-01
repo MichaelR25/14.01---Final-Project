@@ -9,25 +9,33 @@
   justify-content: space-between;
   align-items: center;
   margin: 0px;
-}
-
-.nav-bar img {
-  max-width: 100%;
-  width: auto;
-  height: 100px;
+  padding: 0px;
 }
 
 .nav-links li {
   font-size: 25px;
-  padding: 0rem 2rem;
+  margin: 0px 5%;
 }
 
-.nav-links li a {
+.link-text {
     color: black;
     text-decoration: none;    
+    padding: 1rem 2rem;
+    border-radius: 10px;
 }
 
-.nav-links li a:hover{
-  background-color: gray;
+.link-text:hover{
+  background-color: rgba(0, 0, 0, 0.123);
+  color: #10291D;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
   cursor: pointer;
 }
+
+.link-image {
+  max-width: 100%;
+  width: auto;
+  height: 100px;
+  padding: 1em;
+}
+
+

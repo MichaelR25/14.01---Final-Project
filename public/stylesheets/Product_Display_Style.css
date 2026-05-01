@@ -1,16 +1,18 @@
 .page-content {
-    margin: 3em;
+    
+    margin: 2.5em;
 }
 
 .product-display {
     list-style-type: none;
     width: 250px;
-    margin: 2rem;
+    margin: 1rem;
 }
 
 .product-list {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
 }
 
 .product-link {

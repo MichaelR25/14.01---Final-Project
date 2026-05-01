@@ -1,0 +1,9 @@
+mixin product_display(product)
+    li.product-display
+        a.product-link(href=`/products/${product.product_id}`)
+            img.product-image(src= product.product_image alt=`Product ${product.product_name}`)
+            p.product-name= product.product_name + " - $" + product.price
+        if product.average_rating == NULL
+            p.product-rating= 'Rating: No ratings yet!'
+        else
+            p.product-rating= `Rating: ${product.average_rating} Stars`

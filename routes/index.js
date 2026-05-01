@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 
 /* Gets the top 5 menu items and the landing page*/
-router.get('/', function(req, res, next){
+router.get('/', function(req, res){
   try {
     req.db.query('SELECT * FROM products ORDER BY average_rating DESC LIMIT 5;', (err, results) => {
       if (err) {
@@ -21,7 +21,7 @@ router.get('/', function(req, res, next){
  * Gets product data based on the id from the database, and sends the data with the 
  * product pug view
 */
-router.get('/products/:id', async function(req, res, next){
+router.get('/products/:id', async function(req, res){
   const limit = 5;
   let currentPage = parseInt(req.query.page) || 1;
   const id = parseInt(req.params.id);
@@ -72,19 +72,19 @@ router.get('/menu', function(req, res, next){
 });
 
 /* Gets the about page */
-router.get('/about', function(req, res, next){
+router.get('/about', function(req, res){
     res.render('about', { title: 'Downtown Donuts'});
 });
 
 /* Gets the reviews specifically for the store and responds with the store_reviews page*/
-router.get('/reviews', async function(req, res, next){
+router.get('/reviews', async function(req, res){
   let currentPage = parseInt(req.query.page) || 1;
-  let pageCount = Math.ceil((await getReviewCount(req.db, null) / 10)); 
-  const limit = 10;
+  const limit = 5;
   const offset = (currentPage - 1) * limit;
+  let pageCount = Math.ceil((await getReviewCount(req.db, null) / limit)); 
   console.log(pageCount);
   try {
-    req.db.query('SELECT * FROM shop_reviews AS p JOIN users ON p.user_id = users.user_id ORDER BY review_date DESC LIMIT 10 OFFSET ?;', [offset], (err, results) => {
+    req.db.query('SELECT * FROM shop_reviews AS p JOIN users ON p.user_id = users.user_id ORDER BY review_date DESC LIMIT ? OFFSET ?;', [limit, offset], (err, results) => {
       if (err) {
         console.error('Error fetching store reviews:', err);
         return res.status(500).send('Error fetching store reviews');
@@ -129,6 +129,7 @@ router.post('/api/post-review', async function(req, res) {
         console.error('Error adding store reviews:', err);
         return res.status(500).send('Error fetching store reviews');
       }
+      console.log("Review Posted Successfully for product: " + id);
       res.json({message: "Review Posted Successfully!"});
       updateProductAverage(req.db, id);
     });

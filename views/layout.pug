@@ -1,26 +1,25 @@
 doctype html
-html
+html(lang="en")
   head
     title= title
+    
     link(rel='stylesheet', href='/stylesheets/Body_Style.css')
     link(rel='stylesheet', href='/stylesheets/Nav_Bar_Style.css')
     link(rel="preconnect", href="https://fonts.googleapis.com")
     link(rel="preconnect", href="https://fonts.gstatic.com" crossorigin)
     link(href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap", rel="stylesheet")
-    block styles
+    block links
 
   body.montserrat-normal
     nav.nav-bar
       ul.nav-links
         li
           a(href="/")
-            img#logo(src='../images/black_logo.png')
+            img.link-image(src='../images/black_logo.png' alt='Downtown donuts home page')
         li
-          a#home-link(href="/") Home 
-        li
-          a#menu-link(href="/menu") Menu 
+          a.link-text(href="/menu") Menu 
         li 
-          a#about-link(href="/about") About Us 
+          a.link-text(href="/about") About Us 
         li
-          a#reviews-link(href="/reviews") Reviews
+          a.link-text(href="/reviews") Reviews
     block content

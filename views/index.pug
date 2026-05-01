@@ -1,17 +1,18 @@
 extends layout
+include product_display.pug
 
-block styles 
+block links 
   link(rel='stylesheet', href='/stylesheets/Product_Display_Style.css')
+  link(rel='stylesheet', href='/stylesheets/Homepage_Style.css')
 
 block content
   main.page-content
     h1.page-title Featured Items
     ul.product-list
       each product in featuredProducts
-        li.product-display
-          a.product-link(href=`/products/${product.product_id}`)
-            img.product-image(src= product.product_image)
-            p.product-name= product.product_name + " - $" + product.price
-          p.product-rating= `Rating: ${product.average_rating} Stars`
-    a.order-link(href="https://www.doordash.com/") Order now!
+        +product_display(product)
+  footer.order-services
+    p Order Now!
+    a.order-link(href="https://www.doordash.com/") DoorDash
+    a.order-link(href="https://www.grubhub.com/") GrubHub
 

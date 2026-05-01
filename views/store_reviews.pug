@@ -1,5 +1,9 @@
 extends layout
 
+block links
+    link(rel='stylesheet' href="../stylesheets/Reviews_Style.css")
+    script(src='../javascripts/ReviewForm.js')
+
 block content
     include reviews_layout
     +reviewLayout(null, "Store ")
