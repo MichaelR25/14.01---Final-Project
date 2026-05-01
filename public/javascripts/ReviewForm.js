@@ -2,25 +2,30 @@
 document.addEventListener("DOMContentLoaded", function() {
     const reviewForm = document.querySelector("#review-form");
     const errorText = document.querySelector("#error-box");
+    const submitButton = document.querySelector('input[type="submit"]');
     reviewForm.addEventListener("submit", async function(event) { 
         event.preventDefault();
+        submitButton.disabled = true;
+
         const formData = new FormData(reviewForm);
         const data = new URLSearchParams(formData);
         const userName = data.get("userName").trim();
         const reviewText = data.get("reviewText").trim();
+        
+        
         
         data.set("userName", userName);
         data.set("reviewText", reviewText);
 
         if(userName == "") {
             document.querySelector("#user-name-input").focus();
-            postFailed(reviewForm, errorText, "Username can't be empty!")
+            postFailed(reviewForm, errorText, submitButton, "Username can't be empty!")
         } else if (userName.length > 30) {
             document.querySelector("#review-text").focus();
-            postFailed(reviewForm, errorText, "Username is too long! Username must be 30 characters or less. Character Count: " + userName.length)
+            postFailed(reviewForm, errorText, submitButton, "Username is too long! Username must be 30 characters or less. Character Count: " + userName.length)
         } else if (reviewText.length > 300) {
             document.querySelector("#review-text").focus();
-            postFailed(reviewForm, errorText, "Review is too long! Reivew must be 300 characters or less. Character Count: " + reviewText.length)
+            postFailed(reviewForm, errorText, submitButton, "Review is too long! Reivew must be 300 characters or less. Character Count: " + reviewText.length)
         } else {
             try {
                 const response = await fetch("/api/post-review", {
@@ -33,11 +38,11 @@ document.addEventListener("DOMContentLoaded", function() {
                 } else {
                     console.log("username fail");
                     reviewForm.classList.add("post-failed")
-                    postFailed(reviewForm, errorText, "Unable to post review");
+                    postFailed(reviewForm, errorText, submitButton, "Unable to post review");
                 }
             } catch (error) {
                 console.error("Connection Failed:", error.message);
-                postFailed(reviewForm, errorText, "Connection error, please check your internet connection");
+                postFailed(reviewForm, errorText, submitButton, "Connection error, please check your internet connection");
             }
         }
     });
@@ -48,8 +53,9 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 });
 
-function postFailed(form, errorBox, message) {
+function postFailed(form, errorBox, submit, message) {
     form.classList.add("post-failed");
     errorBox.classList.remove("hidden");
     errorBox.innerText = 'Error: ' + message;
+    submit.disabled = false;
 }

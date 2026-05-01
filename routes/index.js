@@ -23,8 +23,7 @@ router.get('/products/:id', async function(req, res, next){
   let currentPage = parseInt(req.query.page) || 1;
   const id = parseInt(req.params.id);
   const offset = (currentPage - 1) * limit;
-  
-  
+
   try {
     const reviewCount = await getReviewCount(req.db, id);
     let pageCount = reviewCount === 0 ? 1 : Math.ceil(reviewCount / limit);
@@ -43,6 +42,13 @@ router.get('/products/:id', async function(req, res, next){
           err.status = 500;
           return next(err);
         }
+        if(!productResults || productResults.length === 0) {
+          const error = new Error("Error: product not found!")
+          console.error(`Error fetching product with id ${id}`);
+          error.status = 404;
+          return next(error);
+        }
+
         res.render('product', { 
           title: 'Downtown Donuts - ' + productResults[0].product_name,
           product: productResults[0],
